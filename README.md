@@ -1,3 +1,8 @@
+<!--
+Copyright (C) 2026 Maxim [maxirmx] Samsonov ([www.sw.consulting](http://www.sw.consulting))
+All rights reserved.
+-->
+
 # sw-consulting-edge
 
 Neutral HTTPS edge for applications hosted on the shared sw.consulting server.
@@ -29,6 +34,16 @@ The edge can start before either application. A missing application returns a
 
 ```sh
 scripts/update.sh
+```
+
+## Releases
+
+Push a semantic-version tag to create a GitHub Release containing the deployable
+project files as a `.tar.gz` archive and a SHA-256 checksum:
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
 Application stacks attach only their UI services to the external network using

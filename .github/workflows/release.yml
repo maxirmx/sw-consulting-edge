@@ -1,0 +1,65 @@
+# Copyright (C) 2026 Maxim [maxirmx] Samsonov ([www.sw.consulting](http://www.sw.consulting))
+# All rights reserved.
+#
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish release archive
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out tagged revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Build release archive
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          project="${GITHUB_REPOSITORY#*/}"
+          version="${GITHUB_REF_NAME#v}"
+          package_dir="${project}-${version}"
+          archive="${package_dir}.tar.gz"
+
+          mkdir -p "${RUNNER_TEMP}/${package_dir}"
+          cp -a \
+            LICENSE \
+            README.md \
+            docker-compose.yml \
+            edge.env.example \
+            config \
+            scripts \
+            "${RUNNER_TEMP}/${package_dir}/"
+          chmod +x "${RUNNER_TEMP}/${package_dir}/scripts/"*.sh
+
+          tar -C "${RUNNER_TEMP}" -czf "${archive}" "${package_dir}"
+          sha256sum "${archive}" > "${archive}.sha256"
+
+          echo "archive=${archive}" >> "${GITHUB_OUTPUT}"
+          echo "checksum=${archive}.sha256" >> "${GITHUB_OUTPUT}"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARCHIVE: ${{ steps.package.outputs.archive }}
+          CHECKSUM: ${{ steps.package.outputs.checksum }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}"
+          "${ARCHIVE}"
+          "${CHECKSUM}"
+          --verify-tag
+          --generate-notes
+          --title "${GITHUB_REF_NAME}"
