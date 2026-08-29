@@ -18,7 +18,7 @@ readonly CERTIFICATE="$CERTIFICATE_DIR/s.crt"
 readonly PRIVATE_KEY="$CERTIFICATE_DIR/s.key"
 
 [[ -f "$CERTIFICATE" && -f "$PRIVATE_KEY" ]] \
-  || fail "Wildcard TLS files s.crt and s.key are required in $CERTIFICATE_DIR"
+  || fail "TLS files s.crt and s.key are required in $CERTIFICATE_DIR"
 
 for hostname in klinok.sw.consulting sarafan.sw.consulting; do
   openssl x509 -in "$CERTIFICATE" -noout -checkhost "$hostname" >/dev/null \
