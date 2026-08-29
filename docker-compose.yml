@@ -1,0 +1,25 @@
+name: sw-consulting-edge
+
+services:
+  edge:
+    image: nginx:1.31.1-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${SW_CONSULTING_EDGE_CERTIFICATES_DIR:-/srv/sw-consulting-edge/certificates}:/etc/nginx/certificates:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      edge:
+
+networks:
+  edge:
+    name: ${SW_CONSULTING_EDGE_NETWORK:-sw-consulting-edge}
+    driver: bridge
