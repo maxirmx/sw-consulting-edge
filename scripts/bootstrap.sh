@@ -13,14 +13,16 @@ source "$ENV_FILE"
 set +a
 
 readonly PROJECT_NAME="${COMPOSE_PROJECT_NAME:-sw-consulting-edge}"
-readonly CERTIFICATES_DIR="${SW_CONSULTING_EDGE_CERTIFICATES_DIR:-/srv/sw-consulting-edge/certificates}"
+readonly CERTIFICATE_DIR="${SW_CONSULTING_EDGE_CERTIFICATE_DIR:-/srv/sw-consulting-edge/certificate}"
+readonly CERTIFICATE="$CERTIFICATE_DIR/s.crt"
+readonly PRIVATE_KEY="$CERTIFICATE_DIR/s.key"
 
-for application in klinok sarafan; do
-  certificate="$CERTIFICATES_DIR/$application/tls.crt"
-  private_key="$CERTIFICATES_DIR/$application/tls.key"
-  [[ -f "$certificate" && -f "$private_key" ]] || fail "TLS files tls.crt and tls.key are required in $CERTIFICATES_DIR/$application"
-  openssl x509 -in "$certificate" -noout -checkhost "$application.sw.consulting" >/dev/null \
-    || fail "Certificate does not cover $application.sw.consulting: $certificate"
+[[ -f "$CERTIFICATE" && -f "$PRIVATE_KEY" ]] \
+  || fail "Wildcard TLS files s.crt and s.key are required in $CERTIFICATE_DIR"
+
+for hostname in klinok.sw.consulting sarafan.sw.consulting; do
+  openssl x509 -in "$CERTIFICATE" -noout -checkhost "$hostname" >/dev/null \
+    || fail "Certificate does not cover $hostname: $CERTIFICATE"
 done
 
 readonly COMPOSE=(docker compose --project-name "$PROJECT_NAME" --env-file "$ENV_FILE" -f docker-compose.yml)
