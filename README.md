@@ -49,7 +49,7 @@ git push origin v0.1.0
 Application stacks attach only their UI services to the external network using
 aliases like `klinok-ui`, `sarafan-ui` and `sarafan-backoffice`. APIs and databases stay private.
 
-The Sarafan back office is served at `sarafan-b.sw.consulting`, using the
+The Sarafan back office is served at `sb.sw.consulting`, using the
 `sarafan-backoffice:8080` alias supplied by Sarafan Core’s edge Compose overlay.
 Point its DNS record at the edge host and include it in the TLS certificate.
 Its upstream resolves at request time, so an unavailable back office does not
