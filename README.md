@@ -27,8 +27,8 @@ chmod +x scripts/bootstrap.sh scripts/update.sh
 scripts/bootstrap.sh
 ```
 
-The edge can start before either application. A missing application returns a
-502 for its hostname without affecting the edge or the other application.
+The edge can start before the applications. A missing application returns a
+502 for its hostname without affecting the edge or other applications.
 
 ## Updates
 
@@ -47,4 +47,10 @@ git push origin v0.1.0
 ```
 
 Application stacks attach only their UI services to the external network using
-aliases like `klinok-ui` and `sarafan-ui`. APIs and databases stay private.
+aliases like `klinok-ui`, `sarafan-ui` and `sarafan-backoffice`. APIs and databases stay private.
+
+The Sarafan back office is served at `sb.sw.consulting`, using the
+`sarafan-backoffice:8080` alias supplied by Sarafan Core’s edge Compose overlay.
+Point its DNS record at the edge host and include it in the TLS certificate.
+Its upstream resolves at request time, so an unavailable back office does not
+prevent the edge or customer applications from starting.
